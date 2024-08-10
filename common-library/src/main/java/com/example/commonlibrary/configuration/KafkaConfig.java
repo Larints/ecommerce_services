@@ -1,5 +1,7 @@
 package com.example.commonlibrary.configuration;
 
+import org.apache.kafka.clients.admin.AdminClientConfig;
+import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -16,6 +18,38 @@ import java.util.Map;
 @Configuration
 @EnableKafka
 public class KafkaConfig {
+
+    @Bean
+    public KafkaAdmin kafkaAdmin() {
+        Map<String, Object> configs = new HashMap<>();
+        configs.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        return new KafkaAdmin(configs);
+    }
+
+    @Bean
+    public NewTopic payedOrdersTopic() {
+        return new NewTopic("payed_orders", 3, (short) 1);
+    }
+
+    @Bean
+    public NewTopic newOrdersTopic() {
+        return new NewTopic("new_orders", 3, (short) 1);
+    }
+
+    @Bean
+    public NewTopic sentOrdersTopic() {
+        return new NewTopic("sent_orders", 3, (short) 1);
+    }
+
+    @Bean
+    public NewTopic shippedOrdersTopic() {
+        return new NewTopic("shipped_orders", 3, (short) 1);
+    }
+
+    @Bean
+    public NewTopic notifiedOrdersTopic() {
+        return new NewTopic("notified_orders", 3, (short) 1);
+    }
 
     @Bean
     public Map<String, Object> consumerConfigs() {
@@ -35,6 +69,7 @@ public class KafkaConfig {
     public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
+        factory.setConcurrency(3);
         return factory;
     }
 
